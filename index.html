@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Convertix</title>
+  <meta name="description" content="Convertissez images, PDF, documents, tableurs, audio et vidéo d'un simple glisser-déposer. Tout se passe dans votre navigateur : aucun fichier n'est envoyé.">
+  <meta name="theme-color" content="#121311">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23121311'/%3E%3Crect x='8' y='10' width='48' height='20' rx='3' fill='%232a2c27'/%3E%3Crect x='8' y='34' width='48' height='20' rx='3' fill='%232a2c27'/%3E%3Cpath d='M20 44h18m-6-6 6 6-6 6' stroke='%23f2b705' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="brand" href="#" aria-label="Convertix, accueil">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Convertix</span>
+    </a>
+    <nav class="top-nav" aria-label="Sections">
+      <a href="#tableau">Tableau</a>
+      <a href="#destinations">Destinations</a>
+      <button type="button" class="linkish" id="open-settings">Réglages</button>
+    </nav>
+    <p class="top-clock" aria-label="Heure locale"><span id="clock">--:--</span> <span class="top-local">Local · 0 octet envoyé</span></p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">Terminal de conversion · Porte 00</p>
+      <h1 id="hero-title" class="hero-title">
+        <span class="sr-only">Convertissez n'importe quel fichier vers n'importe quel format.</span>
+        <span class="board-line" aria-hidden="true">
+          <span class="flaps" id="hero-from" data-len="4"></span>
+          <span class="hero-arrow">→</span>
+          <span class="flaps" id="hero-to" data-len="4"></span>
+        </span>
+      </h1>
+      <p class="hero-lede">Glissez vos fichiers, choisissez leur destination, récupérez-les convertis. Plus de 60 formats d'images, de PDF, de documents, de tableurs, d'audio et de vidéo. <strong>Tout se passe sur votre appareil.</strong></p>
+
+      <label class="gate" id="gate" for="file-input">
+        <input type="file" id="file-input" multiple hidden>
+        <span class="gate-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="gate-kicker">Déposez ici</span>
+        <span class="gate-title">Fichiers, dossiers, ou collez avec <kbd>⌘</kbd><kbd>V</kbd></span>
+        <span class="gate-actions">
+          <span class="btn primary">Choisir des fichiers</span>
+          <button type="button" class="btn ghost" id="pick-folder">Un dossier entier</button>
+          <button type="button" class="btn ghost" id="load-samples">Essayer avec des exemples</button>
+        </span>
+        <span class="gate-ticker" aria-hidden="true"><span id="ticker"></span></span>
+      </label>
+      <input type="file" id="folder-input" webkitdirectory multiple hidden>
+    </section>
+
+    <section class="board" id="tableau" aria-labelledby="board-title">
+      <header class="board-head">
+        <div>
+          <h2 id="board-title" class="board-title">Départs</h2>
+          <p class="board-sub" id="board-sub">Aucun fichier à bord pour l'instant.</p>
+        </div>
+        <div class="board-tools">
+          <label class="all-to" for="all-to"><span>Tout vers</span>
+            <select id="all-to"><option value="">—</option></select>
+          </label>
+          <button type="button" class="btn primary" id="convert-all" disabled>Tout convertir</button>
+          <button type="button" class="btn ghost" id="download-all" disabled>Tout télécharger (ZIP)</button>
+          <details class="more">
+            <summary class="btn ghost">Plus</summary>
+            <div class="more-menu">
+              <button type="button" id="merge-pdf" disabled>Fusionner les PDF en un seul</button>
+              <button type="button" id="images-pdf" disabled>Assembler les images en un PDF</button>
+              <button type="button" id="clear-done">Retirer les fichiers terminés</button>
+              <button type="button" id="clear-all">Tout vider</button>
+            </div>
+          </details>
+        </div>
+      </header>
+
+      <div class="board-grid" role="table" aria-label="Fichiers en cours de conversion">
+        <div class="row row-head" role="row">
+          <span role="columnheader">Vol</span>
+          <span role="columnheader">Fichier</span>
+          <span role="columnheader">De</span>
+          <span role="columnheader">Vers</span>
+          <span role="columnheader">Statut</span>
+          <span role="columnheader"><span class="sr-only">Actions</span></span>
+        </div>
+        <div id="rows" role="rowgroup"></div>
+        <p class="empty" id="empty">Le tableau s'affichera dès votre premier fichier. Glissez-le n'importe où sur la page.</p>
+      </div>
+      <p class="engine-status" id="engine-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="dest" id="destinations" aria-labelledby="dest-title">
+      <header class="dest-head">
+        <p class="eyebrow">Lignes desservies</p>
+        <h2 id="dest-title" class="section-title">Destinations</h2>
+        <p class="section-lede">Chaque famille de fichiers et les formats vers lesquels elle part. Le lecteur intégré ouvre aussi tous ces formats sans les convertir.</p>
+      </header>
+      <div class="dest-grid" id="dest-grid"></div>
+    </section>
+
+    <section class="promise" aria-labelledby="promise-title">
+      <h2 id="promise-title" class="section-title">Vos fichiers ne décollent jamais</h2>
+      <div class="promise-grid">
+        <p><strong>Aucun envoi.</strong> Les conversions tournent dans votre navigateur avec WebAssembly. Coupez le Wi-Fi après le chargement : ça marche encore.</p>
+        <p><strong>Aucune limite artificielle.</strong> Pas de compte, pas de file d'attente, pas de filigrane. La seule limite est la mémoire de votre appareil.</p>
+        <p><strong>Réglages fins.</strong> Qualité, redimensionnement, rotation, débit audio, découpe, images par seconde, séparateur CSV : tout est dans les réglages.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Convertix · conversion locale, dans votre navigateur · aucun compte, aucun envoi</p>
+  </footer>
+
+  <aside class="settings" id="settings" aria-labelledby="settings-title" hidden>
+    <div class="settings-panel">
+      <header class="settings-head">
+        <h2 id="settings-title">Réglages de vol</h2>
+        <button type="button" class="btn ghost" id="close-settings">Fermer</button>
+      </header>
+      <form id="opts" class="opts" onsubmit="return false">
+        <fieldset>
+          <legend>Images</legend>
+          <label for="o-quality">Qualité <output id="o-quality-out">90</output></label>
+          <input type="range" id="o-quality" name="quality" min="10" max="100" value="90">
+          <div class="pair">
+            <label for="o-maxW">Largeur max (px)<input type="number" id="o-maxW" name="maxW" min="1" placeholder="Aucune"></label>
+            <label for="o-maxH">Hauteur max (px)<input type="number" id="o-maxH" name="maxH" min="1" placeholder="Aucune"></label>
+          </div>
+          <label for="o-scale">Échelle (%)<input type="number" id="o-scale" name="scale" min="1" max="800" value="100"></label>
+          <label for="o-rotate">Rotation
+            <select id="o-rotate" name="rotate"><option value="0">Aucune</option><option value="90">90° horaire</option><option value="180">180°</option><option value="270">90° anti-horaire</option></select>
+          </label>
+          <div class="checks">
+            <label><input type="checkbox" id="o-flipH" name="flipH"> Miroir horizontal</label>
+            <label><input type="checkbox" id="o-flipV" name="flipV"> Miroir vertical</label>
+            <label><input type="checkbox" id="o-gray" name="gray"> Noir et blanc</label>
+            <label><input type="checkbox" id="o-fillBg" name="fillBg"> Remplir la transparence</label>
+          </div>
+          <label for="o-bg">Couleur de fond (JPG, PDF)<input type="color" id="o-bg" name="bg" value="#ffffff"></label>
+        </fieldset>
+        <fieldset>
+          <legend>PDF</legend>
+          <label for="o-pdfScale">Netteté des pages exportées
+            <select id="o-pdfScale" name="pdfScale"><option value="1">Standard (72 ppp)</option><option value="2" selected>Nette (144 ppp)</option><option value="3">Impression (216 ppp)</option><option value="4">Très haute (288 ppp)</option></select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Audio</legend>
+          <label for="o-bitrate">Débit
+            <select id="o-bitrate" name="bitrate"><option>96</option><option>128</option><option selected>192</option><option>256</option><option>320</option></select>
+          </label>
+          <label for="o-rate">Fréquence
+            <select id="o-rate" name="rate"><option value="">D'origine</option><option value="48000">48 kHz</option><option value="44100">44,1 kHz</option><option value="22050">22 kHz</option><option value="16000">16 kHz</option></select>
+          </label>
+          <div class="checks">
+            <label><input type="checkbox" id="o-mono" name="mono"> Mono</label>
+            <label><input type="checkbox" id="o-normalize" name="normalize"> Normaliser le volume</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Vidéo</legend>
+          <div class="pair">
+            <label for="o-vWidth">Largeur max (px)<input type="number" id="o-vWidth" name="vWidth" min="16" placeholder="D'origine"></label>
+            <label for="o-fps">Images / s<input type="number" id="o-fps" name="fps" min="1" max="120" placeholder="D'origine"></label>
+          </div>
+          <label for="o-crf">Compression <output id="o-crf-out">26</output></label>
+          <input type="range" id="o-crf" name="crf" min="16" max="40" value="26">
+          <p class="hint">Plus le chiffre est haut, plus le fichier est léger et moins il est net.</p>
+          <label for="o-frameAt">Capture d'image à (s)<input type="number" id="o-frameAt" name="frameAt" min="0" step="0.1" value="1"></label>
+          <div class="checks"><label><input type="checkbox" id="o-mute" name="mute"> Retirer le son</label></div>
+        </fieldset>
+        <fieldset>
+          <legend>Découpe audio et vidéo</legend>
+          <div class="pair">
+            <label for="o-start">Début (s)<input type="number" id="o-start" name="start" min="0" step="0.1" placeholder="0"></label>
+            <label for="o-duration">Durée (s)<input type="number" id="o-duration" name="duration" min="0" step="0.1" placeholder="Tout"></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Données et noms</legend>
+          <label for="o-csvDelim">Séparateur CSV
+            <select id="o-csvDelim" name="csvDelim"><option value=",">Virgule ( , )</option><option value=";">Point-virgule ( ; ) pour Excel français</option><option value="|">Barre ( | )</option></select>
+          </label>
+          <label for="o-pattern">Nom des fichiers produits<input type="text" id="o-pattern" name="pattern" value="{nom}" spellcheck="false"></label>
+          <p class="hint"><code>{nom}</code> nom d'origine · <code>{n}</code> numéro de vol · <code>{date}</code> date du jour</p>
+        </fieldset>
+        <button type="reset" class="btn ghost" id="reset-opts">Revenir aux réglages par défaut</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="dropveil" id="dropveil" aria-hidden="true"><span>Lâchez pour embarquer</span></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

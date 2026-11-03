@@ -4,10 +4,13 @@ Convertisseur de fichiers par glisser-déposer qui tourne entièrement dans le n
 
 **En ligne : https://convertix-eh9.pages.dev**
 
+![Accueil de Convertix : tableau à palettes affichant DOCX → PDF et zone de dépôt](docs/captures/accueil.jpg)
+
 L'interface reprend un tableau des départs d'aéroport à palettes. Chaque fichier déposé devient un « vol » (CX 001…) avec un format de départ, une destination et un statut : PRÊT, EMBARQ xx %, ARRIVÉ ou ANNULÉ.
 
 ## Sommaire
 
+- [Captures](#captures)
 - [Fonctionnalités](#fonctionnalités)
 - [Formats pris en charge](#formats-pris-en-charge)
 - [Lecteur intégré](#lecteur-intégré)
@@ -19,6 +22,31 @@ L'interface reprend un tableau des départs d'aéroport à palettes. Chaque fich
 - [Déploiement](#déploiement)
 - [Architecture](#architecture)
 - [Ajouter un format](#ajouter-un-format)
+
+## Captures
+
+**Le tableau des départs** : chaque fichier est un vol, avec sa destination, son statut et ses résultats.
+
+![Tableau des départs après conversion de six fichiers](docs/captures/tableau.jpg)
+
+**Le lecteur intégré** : images, tableaux filtrables, audio avec forme d'onde, et bien d'autres.
+
+| Image | Données | Audio |
+|---|---|---|
+| ![Lecteur d'image](docs/captures/lecteur-image.jpg) | ![Lecteur de tableau CSV](docs/captures/lecteur-donnees.jpg) | ![Lecteur audio avec forme d'onde](docs/captures/lecteur-audio.jpg) |
+
+**Les réglages et les destinations**
+
+| Réglages | Destinations |
+|---|---|
+| ![Panneau des réglages](docs/captures/reglages.jpg) | ![Grille des formats par famille](docs/captures/destinations.jpg) |
+
+**Sur mobile**
+
+<p>
+  <img src="docs/captures/mobile-accueil.jpg" alt="Accueil sur mobile" width="260">
+  <img src="docs/captures/mobile-tableau.jpg" alt="Tableau sur mobile" width="260">
+</p>
 
 ## Fonctionnalités
 
@@ -113,6 +141,8 @@ ONLY=pdf,docx node scripts/e2e.mjs https://convertix-eh9.pages.dev ./fixtures   
 ```
 
 Le dossier de test doit contenir un fichier par format de départ à vérifier, par exemple `photo.png`, `rapport.pdf`, `doc.docx`, `gens.csv`, `data.json`, `son.wav` et `clip.mp4`. Le chemin de Chrome se règle avec la variable `CHROME`. Sans elle, le script cherche Chrome à son emplacement habituel sur macOS.
+
+Les captures du README se refont avec `node scripts/captures.mjs <url> docs/captures <dossier-de-test>`.
 
 Dernier passage complet sur le site en ligne : 14 fichiers de départ, 101 conversions, aucun échec.
 
